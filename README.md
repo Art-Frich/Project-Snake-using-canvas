@@ -11,3 +11,5 @@ URL: https://thecode.media/snake-js/
     функции возрастания скорости,
     количество игроков (1 или 2) 
   }
+  
+  [Ссылка на проект](https://art-frich.github.io/Project-Snake/index.html)
