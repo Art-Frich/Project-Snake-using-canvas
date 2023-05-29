@@ -1,70 +1,57 @@
-// Поле, на котором всё будет происходить
 var canvas = document.getElementById("game");
-// Обозначаем двумерность
 var context = canvas.getContext("2d");
-// Устанавливаем размер ячейки на поле;
-var grid = 16;
-// Скорость игры
+var grid = 16; //ячейка поля в px
 var speed = 0; //служебная переменная
 var speed_lim = 5; //параметр отвечающий за скорость
 
-// Непосредственно змейка
 var snake = {
   x: 160,
   y: 160,
-  dx: grid, //скорость змейки => движемся на 1 клетку по горизонтали
-  dy: 0, //по вертикали не движемся
-  cells: [], //хвост, который наели
-  maxCells: 4, //начальная длина змейки
+  dx: grid, //скорость по горизонтали
+  dy: 0, //скорость по вертикали
+  cells: [], //образовавшийся хвост
+  maxCells: 4, //начальная длина
 };
 
 // Генератор случайных чисел в заданном диапазоне
-// max-min обеспечивает диапазон от 0 до min-max
-// Но этот прием нужен, чтобы установить нижний порог в min
-// +min гарантирует, что будет получено значение не ниже min
+// + min гарантирует, что будет получено значение не ниже min
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-// получить размеры игрового поля в типе int, для рандомизации появления еды в начале
+// получить размеры игрового поля для рандомизации появления еды
 let canv_object = document.querySelector(".canvas"),
-  style = window.getComputedStyle(canv_object),
-  size_x = Number(style.getPropertyValue("width").slice(0, -2)),
-  size_y = Number(style.getPropertyValue("height").slice(0, -2));
-canvas.width = size_x; //явно задаю размеры холсту
-canvas.height = size_y; //подробности https://overcoder.net/q/9360/canvas-%D1%80%D0%B0%D1%81%D1%82%D1%8F%D0%B3%D0%B8%D0%B2%D0%B0%D0%B5%D1%82%D1%81%D1%8F-%D0%BF%D1%80%D0%B8-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B8-css-%D0%BD%D0%BE-%D0%BE%D0%B1%D1%8B%D1%87%D0%BD%D0%BE-%D1%81%D0%BE-%D1%81%D0%B2%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%D0%BC%D0%B8-width-height
-// получить объект canvas -> извлечь все назначаемые css стили -> получить значение стиля (тип int) -> срезать последние 2 символа (px) -> преобразовать к типу int
-// console.log(canvas.width,canvas.height) - решение могло быть короче, но почему-то canvas параметры работают некорректно: 300 и 150, вместо заданных в css
+  style = window.getComputedStyle(canv_object), //стили объекта canvas
+  size_x = Number(style.getPropertyValue("width").slice(0, -2)), //css width за вычетом 'px'
+  size_y = Number(style.getPropertyValue("height").slice(0, -2)); //аналогично
+canvas.width = size_x;
+canvas.height = size_y;
 
-// еда для змейки
 var food = {
-  x: getRandomInt(0, Math.floor(size_x/grid))*grid, //начальные координаты еды
+  x: getRandomInt(0, Math.floor(size_x/grid))*grid,
   y: getRandomInt(0, Math.floor(size_y/grid))*grid
 };
 
-//Игровой цикл
 function loop() {
-  // Дальше будет хитрая функция, которая замедляет скорость игры с 60 кадров в секунду до 15. Для этого она пропускает три кадра из четырёх, то есть срабатывает каждый четвёртый кадр игры. Было 60 кадров в секунду, станет 15.
+// Дальше будет хитрая функция, которая замедляет скорость игры с 60 кадров в секунду до 15.
   requestAnimationFrame(loop);
   if (++speed < speed_lim) {
     return;
   }
-
-  // обнулим счетчик скорости игры
+  // обнулим счетчик
   speed = 0;
 
   // Очистка игрового поля
   context.clearRect(0, 0, canvas.width, canvas.height);
-  snake.x += snake.dx; //прописываем изменение координты змейки
-  snake.y += snake.dy; //величина изменений = grid = скорость
-
+  snake.x += snake.dx; //прописываем изменение координат змейки
+  snake.y += snake.dy; 
+  
   // Обработка случая попадания на край поля
   if (snake.x < 0) {
     snake.x = canvas.width - grid;
-  } else if (snake.x > canvas.width-grid) {
+  } else if (snake.x > canvas.width - grid) {
     snake.x = 0; 
-    //здесь не нужен "+- grid", т.к. отрисовка начинается с левого верхнего угла, поэтому в данном случае отрисовка будет корректной, в отличие от от случая выше
-    // но в данном случае важно проверить, что змейкане отрисовалась от границы за кадром...
+    //здесь не нужен "+- grid", т.к. отрисовка начинается с левого верхнего угла
   }
 
   if (snake.y < 0) {
@@ -87,7 +74,6 @@ function loop() {
   snake.cells.forEach(function (item, index) {
     context.fillRect(item.x, item.y, grid - 1, grid - 1);
     // grid -1 создаст эффект клетки между частями змейки
-    // займемся отрисовкой еды. Еда будет по размеру совпадать с змейкой
 
     if (snake.x === food.x && snake.y === food.y) {
       snake.maxCells++;
@@ -107,7 +93,6 @@ function loop() {
     }
   });
 };
-
 
 //пропишем реакцию на стрелочки
 document.addEventListener('keydown', function(key) {
