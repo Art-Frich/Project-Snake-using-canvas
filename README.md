@@ -1,5 +1,5 @@
 # Проект: Змейка
-### [Ссылка на проект](https://art-frich.github.io/Project-Snake/index.html)
+### [Ссылка на проект](https://art-frich.github.io/Project-Snake-using-canvas/)
 ### Описание
 Реализация старой доброй змейки
 ### Дополнительная информация
